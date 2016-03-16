@@ -2,6 +2,7 @@ package com.adarshjayakumar.topdownloader;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.MainThread;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private String nFileContents;
     private Button xmlParse;
     private ListView xmlResult;
+    private ArrayAdapter<Application> myAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,15 +35,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
         xmlParse  = (Button) findViewById(R.id.button);
         xmlResult = (ListView) findViewById(R.id.xmlListView);
         xmlParse.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v)
+            {
                 ParseApplication parseApplication = new ParseApplication(nFileContents);
                 parseApplication.process();
+                myAdapter = new ArrayAdapter<Application>
+                        (
+                        MainActivity.this,R.layout.list_item,parseApplication.getApplications());
+                        xmlResult.setAdapter(myAdapter);
+
             }
         });
+
         DownloadData downloadData = new DownloadData();
         downloadData.execute("http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topsongs/limit=25/xml");
 
